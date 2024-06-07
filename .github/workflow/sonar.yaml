@@ -1,11 +1,8 @@
-
 name: SonarQube Scan
 
 on:
   pull_request:
-    branches:
-      - main
-    types: [opened, synchronize]
+    types: [opened]
 
 jobs:
   sonarqube_scan:
@@ -23,32 +20,10 @@ jobs:
           java-version: '11'
           
       - name: SonarQube Scan
-        uses: sonarsource/sonarcloud-github-action@master
-        env:
-          GIT_TOKEN: ${{ secrets.GIT_TOKEN }}
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }} # Make sure you have added the SonarQube token as a secret in your GitHub repository settings
-
-      - name: Extract SonarQube Analysis Summary
-        id: extract_summary
-        run: echo "::set-output name=summary::$(cat ${GITHUB_WORKSPACE}/.scannerwork/report-task.txt | grep 'ceTaskUrl=' | sed 's/ceTaskUrl=/[SonarQube Analysis](''/' | sed 's/$/'')/')"
-
-      - name: Create Check
-        uses: actions/github-script@0.9.0
-        with:
-          script: |
-            const summary = '${{ steps.extract_summary.outputs.summary }}';
-            const { data: check } = await github.checks.create({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              name: 'SonarQube Scan',
-              head_sha: context.payload.pull_request.head.sha,
-              status: 'completed',
-              conclusion: 'success',
-              output: {
-                title: 'SonarQube Scan',
-                summary: summary,
-              },
-            });
-            console.log(`Check created: ${check.html_url}`);
-          env:
-            GIT_TOKEN: ${{ secrets.GIT_TOKEN }}
+        run: |
+          # Replace these commands with the ones appropriate for your project
+          # Example commands for a Gradle project:
+          sonar-scanner \
+            -Dsonar.host.url=http://43.204.140.100:9000 \
+            -Dsonar.login=sqp_d2770241c77b4d75ede1cdec99de39bda60acec8 \
+            -Dsonar.projectKey=simple
